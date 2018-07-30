@@ -1772,6 +1772,15 @@ class Agent():
         """
         linger = get_linger(linger)
         socket.close(linger=linger)
+        address = self._address[socket]
+        if address.transport == 'ipc':
+            # cleanup ipc sockets
+            try:
+                os.unlink(address.address)
+            except FileNotFoundError:
+                # someone else already removed it,
+                # e.g. libzmq < 4.2
+                pass
 
     def close(self, alias, linger=None):
         """
