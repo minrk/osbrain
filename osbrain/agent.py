@@ -1774,9 +1774,13 @@ class Agent():
         socket.close(linger=linger)
         address = self._address[socket]
         if address.transport == 'ipc':
+            if isinstance(address, AgentChannel):
+                path = address.receiver.address or address.sender.address
+            else:
+                path = address.address
             # cleanup ipc sockets
             try:
-                os.unlink(address.address)
+                os.unlink(path)
             except FileNotFoundError:
                 # someone else already removed it,
                 # e.g. libzmq < 4.2
